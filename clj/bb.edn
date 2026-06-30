@@ -1,0 +1,7 @@
+{:tasks
+ {:requires ([babashka.fs :as fs])
+  test {:doc "Run Clojure tests"
+        :task (shell "clojure -M:test")}
+  clean {:doc "Remove local caches"
+         :task (doseq [p [".cpcache" "target"]]
+                 (fs/delete-tree p))}}}

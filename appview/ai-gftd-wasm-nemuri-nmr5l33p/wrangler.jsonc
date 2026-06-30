@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ai-gftd-wasm-nemuri-nmr5l33p",
+  "compatibility_date": "2026-06-01",
+  "main": "src/app.cljc",
+  "routes": [
+    { "pattern": "nubatama.net/*", "zone_name": "nubatama.net" },
+    { "pattern": "www.nubatama.net/*", "zone_name": "nubatama.net" },
+    { "pattern": "nemuri.gftd.ai/*", "zone_name": "gftd.ai" }
+  ],
+  "d1_databases": [
+    {
+      "binding": "NEMURI_DB",
+      "database_name": "ai-gftd-nemuri",
+      "database_id": "REPLACE_WITH_D1_ID",
+      "migrations_dir": "d1/migrations"
+    }
+  ],
+  "vars": {
+    "DISPATCHER_URL": "https://dispatcher.gftd.ai/xrpc"
+  },
+  "// secrets": "DISPATCHER_INTERNAL_SECRET set via `wrangler secret put` (== k8s bpmn-dispatcher-auth/internal-secret)"
+}

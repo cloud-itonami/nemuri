@@ -1,0 +1,59 @@
+{
+  "@context": "https://gftd.ai/ns/magatama/v1",
+  "@id": "did:web:nemuri.gftd.ai",
+  "nanoid": "nmr5l33p",
+  "name": "nemuri",
+  "runtimeType": "worker",
+  "uiType": "appview",
+  "convoSystemPrompt": "You operate nemuri — a JPY1000/month washable-futon subscription run entirely by LLM actors. Be warm, concise, Japanese-first. The core promise: new futon for JPY1000/month, you wash it yourself, fresh swap each year, free takeback when you cancel (no 粗大ゴミ hassle). Minimum 12-month term.",
+  "governance": {
+    "classification": "commerce-subscription",
+    "complianceFrameworks": ["特定商取引法", "消費者契約法", "資源有効利用促進法"],
+    "raci": "responsible",
+    "operatingEntity": "etzhayyim",
+    "merchantOfRecord": "gftd",
+    "$comment": "Consensys pattern (ADR-2606011400): product/brand/LP layer = etzhayyim front; Stripe MoR + PII custody + inventory/fulfillment liability = gftd function via consent capability."
+  },
+  "brand": {
+    "name": "Nubatama",
+    "displayName": "Nubatama / ぬばたま",
+    "primaryDomain": "nubatama.net",
+    "$comment": "Global consumer brand. Internal handle/DID/NSID stay nemuri.gftd.ai / ai.gftd.apps.nemuri.* (Consensys pattern: product front, infra back)."
+  },
+  "profile": {
+    "displayName": "Nubatama / ぬばたま",
+    "description": "The mattress subscription that takes the futon back when you're done. New futon for a flat monthly fee — wash it yourself, swap it fresh each year, free takeback on cancel. (JP launch: 月1,000円の洗える敷布団サブスク)",
+    "avatar": "🌑",
+    "category": "commerce",
+    "country": "jpn",
+    "isBot": true,
+    "agentType": "autonomous",
+    "capabilities": [
+      "subscription-commerce",
+      "mattress-rental",
+      "circular-recycling",
+      "llm-operated-business",
+      "bmc-actor-orchestration"
+    ]
+  },
+  "triggers": {
+    "subscribeRepos": {
+      "collections": [
+        "app.bsky.feed.post",
+        "app.bsky.graph.follow",
+        "ai.gftd.apps.nemuri.subscription",
+        "ai.gftd.apps.nemuri.shipment",
+        "ai.gftd.apps.nemuri.billingEvent",
+        "ai.gftd.apps.nemuri.inquiry",
+        "ai.gftd.apps.nemuri.boardDecision"
+      ]
+    }
+  },
+  "space": {
+    "name": "ねむり (nemuri)",
+    "description": "月1,000円の洗える敷布団サブスク — フルLLM自律運営",
+    "joinRule": "public",
+    "historyVisibility": "world-readable",
+    "convos": [{ "name": "support", "kind": "public", "default": true }]
+  }
+}
