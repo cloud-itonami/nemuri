@@ -37,14 +37,31 @@ growthStrategist(planGrowth) / contentSmith(generateContent) / adBuyer(manageAds
 ## Layout
 
 ```
-clj/{deps.edn, bb.edn, langgraph.edn, Dockerfile, src/nemuri/{core,registry,server}.cljc*, test/nemuri/*.cljc}
-appview/ai-gftd-wasm-nemuri-nmr5l33p/{magatama.jsonld, wrangler.jsonc, src/app.cljc,
-  svelte/src/{lib/api.cljc, routes/+page.svelte, routes/xrpc/[nsid]/+server.cljc, routes/_d1/+server.cljc},
+clj/{deps.edn, bb.edn, langgraph.edn, Dockerfile,
+  src/nemuri/{core,registry,server,xrpc}.cljc, test/nemuri/*.cljc}
+appview/ai-gftd-wasm-nemuri-nmr5l33p/{magatama.jsonld, wrangler.jsonc,
+  package.json, shadow-cljs.edn,
+  src/nemuri/appview/worker.cljs, test/nemuri/appview/worker_test.cljs,
   d1/migrations/0001_nemuri.sql}
 00-contracts/lexicons/ai/gftd/apps/nemuri/*.json (21 methods + 6 records)
 00-contracts/policies/nemuri/envelope.rego  (OPA: data.nemuri.envelope)
 CEO OODA is represented by the CLJ `board_review` plan surface.
 ```
+
+> 2026-07-06 update (ADR-2607061200): the `svelte/` + `src/app.cljc`
+> ("SvelteKit adapter fallback") layout this note replaces was never actually
+> built and is now superseded — per ADR-2606290000 ("worker は全て CLJC の
+> みに") SvelteKit isn't the target substrate for new gftdcojp Workers
+> anyway. The appview Worker is a plain shadow-cljs `:esm` fetch worker (the
+> `orgs/kotoba-lang/kotobase-cljc-worker` pattern): `nemuri.appview.worker`
+> requires `nemuri.core` / `nemuri.registry` / `nemuri.xrpc` straight from
+> `clj/src` as a shadow-cljs source-path — one `.cljc` plan surface, run on
+> the JVM (`clj/test`, `nemuri.server`) *and* compiled into the Worker, no
+> parallel TS/Svelte reimplementation. Build:
+> `cd appview/ai-gftd-wasm-nemuri-nmr5l33p && npm install && npm run build`
+> -> `out/worker.js` (`wrangler.jsonc` `main`). `npm test` runs the same
+> fetch-handler under Node's real `Request`/`Response`/`URL` globals
+> (`:worker-test`, node-test target) — no mocking.
 
 ## ガバナンス封筒 (envelope.rego)
 
@@ -59,6 +76,20 @@ CEO OODA is represented by the CLJ `board_review` plan surface.
 5. Stripe Billing / 3PL / 反毛リサイクル業者 契約 + 特商法ページ法務レビュー
 6. `deps.toml` `[[projects]]` / `[[mitama_actors]]` 登録
 
-## ⚠️ 未実装 (scaffold段階)
+## ⚠️ 未実装 / stubbed (2026-07-06 現在、ADR-2607061200)
 
-graph の外部 API 実体 (Stripe charge / 各キャリア label / Ads API / mailer 送信) は Worker側 binding 経由で結線が必要。現状 CLJ graph は intent/plan + envelope-like guardrail result のみを返し、money/legal/PO/contract 系は `approval_required` / `dry_run` を明示する。`src/app.cljc` は SvelteKit adapter の fallback。
+- **appview Worker は結線済み**: `POST /xrpc/{nsid}`（`reportPnl` は `query` なので
+  `GET` も可）が lexicon 21 method 中 20 を `nemuri.core`/`nemuri.registry` の
+  pure handler に直結（dispatcher.gftd.ai 経由なし。そのホップは恒久的に死んで
+  いる — k8s クラスタ自体が撤去済み）。
+- **`ai.gftd.apps.nemuri.getActiveLp`（`query`）のみ未実装**: lexicon には
+  存在するが `nemuri.core/nsid->graph` に対応 graph が無く、実 D1 (`lp_variants`
+  テーブル、`d1/migrations/0001_nemuri.sql`) の read が要る唯一の NSID。
+  他 19 NSID の "zero I/O / pure" 前提が崩れるため、意図的に後続タスクとして
+  残してある（`nemuri.xrpc/not-implemented-nsids` に明示）。呼ぶと
+  `unknown_nsid`（404）。
+- graph の外部 API 実体 (Stripe charge / 各キャリア label / Ads API / mailer 送信)
+  は依然 binding 経由の結線が必要。現状 CLJ graph は intent/plan +
+  envelope-like guardrail result のみを返し、money/legal/PO/contract 系は
+  `approvalRequired` / `dryRun` を明示する（Worker はこれをそのまま透過する
+  だけで、承認・実行ロジックは一切持たない）。

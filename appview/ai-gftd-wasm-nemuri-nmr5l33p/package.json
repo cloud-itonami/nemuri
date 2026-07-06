@@ -1,0 +1,13 @@
+{
+  "name": "ai-gftd-wasm-nemuri-nmr5l33p",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "^2.28.20",
+    "wrangler": "^4.0.0"
+  },
+  "scripts": {
+    "test": "shadow-cljs compile worker-test && node out/node-tests.js",
+    "build": "shadow-cljs release worker",
+    "dev": "shadow-cljs watch worker"
+  }
+}

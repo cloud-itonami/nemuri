@@ -1,0 +1,76 @@
+(ns nemuri.xrpc
+  "Pure XRPC wire-shaping + dispatch for the ai-gftd-nemuri appview Worker.
+
+  The 00-contracts/lexicons/ai/gftd/apps/nemuri/*.json NSIDs speak camelCase
+  (`subId`, `addressRef`, `dailyJpy`, ...) per atproto/AT Lexicon convention;
+  `nemuri.core`'s pure handlers speak snake_case (`:sub_id`, `:address_ref`,
+  `:daily_jpy`, ...) — the same convention `nemuri.server` (the JVM dev
+  server) already normalizes for its own `/xrpc/*` route. This ns is the
+  single, dependency-free (no D1/Stripe/carrier/OPA/LLM/mailer I/O — just
+  `clojure.string` + `nemuri.registry`) place that conversion lives so both
+  the JVM server and the Cloudflare Worker (appview/.../src/nemuri/appview/
+  worker.cljs) can share it and stay provably in sync, and so it is testable
+  identically on the JVM (`clojure -M:test`) and under cljs (shadow-cljs
+  `:worker-test`, ADR-2607061200) without a fetch/Request/D1 stub in sight.
+
+  `nemuri.server` itself is left untouched (it has its own inline camel->snake
+  for the same reason, predates this ns, and is already covered by
+  `nemuri.server-test`) — this ns is additive, not a refactor of it."
+  (:require [clojure.string :as str]
+            [nemuri.registry :as registry]))
+
+(defn- camel->snake-str [s]
+  (-> (str/replace s #"([a-z0-9])([A-Z])" "$1_$2")
+      str/lower-case))
+
+(defn- snake->camel-str [s]
+  (let [[head & tail] (str/split s #"_")]
+    (apply str head (map str/capitalize tail))))
+
+(defn- transform-keys
+  "Deep-walk a JSON-shaped value (maps/vectors/scalars), rewriting every map
+  key through `key-fn`. Non-keyword/string keys pass through unchanged
+  (never seen in practice here — every payload comes from JSON.parse or
+  `edn/read-string` keyword maps)."
+  [key-fn x]
+  (cond
+    (map? x)
+    (into {} (map (fn [[k v]]
+                    [(cond (keyword? k) (keyword (key-fn (name k)))
+                           (string? k)  (key-fn k)
+                           :else        k)
+                     (transform-keys key-fn v)])
+                  x))
+    (sequential? x) (mapv (partial transform-keys key-fn) x)
+    :else x))
+
+(defn request->payload
+  "camelCase (lexicon wire) map -> snake_case keys `nemuri.core` expects."
+  [m]
+  (transform-keys camel->snake-str m))
+
+(defn response->wire
+  "snake_case handler output -> camelCase for the lexicon wire shape."
+  [m]
+  (transform-keys snake->camel-str m))
+
+(def not-implemented-nsids
+  "Lexicon NSIDs (00-contracts/lexicons/ai/gftd/apps/nemuri) with no pure
+  handler in `nemuri.core`/`nemuri.registry` yet — `dispatch-nsid` falls
+  through to `unknown_nsid` (404) for these, same as any typo'd NSID.
+  `getActiveLp` is a `query` that needs to actually read the D1
+  `lp_variants` table (appview/.../d1/migrations/0001_nemuri.sql) — the one
+  read the zero-I/O CLJ plan surface deliberately doesn't own. Deferred
+  until the appview Worker grows a D1-backed read path (ADR-2607061200)."
+  #{"ai.gftd.apps.nemuri.getActiveLp"})
+
+(defn handle
+  "nsid (string) + raw-payload (camelCase, keywordized JSON map or query
+  params) -> {:status int :body map (camelCase)}. Status convention mirrors
+  `nemuri.server/handle-xrpc`: any `:error` key on the dispatch result -> 404,
+  else 200 — so the Worker and the JVM dev server agree on behavior for the
+  same NSID + payload."
+  [nsid raw-payload]
+  (let [result (registry/dispatch-nsid nsid (request->payload (or raw-payload {})))
+        status (if (:error result) 404 200)]
+    {:status status :body (response->wire result)}))

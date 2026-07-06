@@ -1,8 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
+  // CLJC :esm fetch worker (ADR-2607061200 / ADR-2606290000 "worker は全て
+  // CLJC のみに", pattern per orgs/kotoba-lang/kotobase-cljc-worker). Build:
+  // `npm install && npm run build` -> out/worker.js (default export {fetch}).
+  // Routes POST/GET /xrpc/{nsid} directly to the zero-I/O nemuri.core plan
+  // surface (clj/src/nemuri/{core,registry,xrpc}.cljc) — the dead
+  // dispatcher.gftd.ai hop (k8s cluster gone, owner directive: prune) is
+  // removed, not replaced.
   "name": "ai-gftd-wasm-nemuri-nmr5l33p",
   "compatibility_date": "2026-06-01",
-  "main": "src/app.cljc",
+  "main": "out/worker.js",
   "routes": [
     { "pattern": "nubatama.net/*", "zone_name": "nubatama.net" },
     { "pattern": "www.nubatama.net/*", "zone_name": "nubatama.net" },
@@ -10,14 +17,14 @@
   ],
   "d1_databases": [
     {
+      // Unused by any route yet — every current handler is dry_run/plan-only
+      // (zero I/O). Reserved for ai.gftd.apps.nemuri.getActiveLp, the one
+      // lexicon NSID still stubbed (needs a real read of lp_variants; see
+      // ADR-2607061200).
       "binding": "NEMURI_DB",
       "database_name": "ai-gftd-nemuri",
       "database_id": "REPLACE_WITH_D1_ID",
       "migrations_dir": "d1/migrations"
     }
-  ],
-  "vars": {
-    "DISPATCHER_URL": "https://dispatcher.gftd.ai/xrpc"
-  },
-  "// secrets": "DISPATCHER_INTERNAL_SECRET set via `wrangler secret put` (== k8s bpmn-dispatcher-auth/internal-secret)"
+  ]
 }

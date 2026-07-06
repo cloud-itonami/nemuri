@@ -1,0 +1,26 @@
+;; CLJC/CLJS appview Worker for ai-gftd-nemuri (ADR-2607061200; pattern +
+;; source-path convention per orgs/kotoba-lang/kotobase-cljc-worker,
+;; ADR-2606290000 "worker は全て CLJC のみに").
+;;  :worker      — :esm workerd bundle (default export = fetch handler),
+;;                 `npx shadow-cljs release worker` -> out/worker.js
+;;                 (wrangler.jsonc `main`).
+;;  :worker-test — node-test of the same fetch-handler (real js/Request /
+;;                 js/Response / js/URL — all Node 18+ globals, no mocking).
+;;
+;; The `../../clj/src` source-path pulls in nemuri.core/registry/xrpc
+;; directly from the shared pure-logic tree (clj/{deps.edn,src/nemuri/*.cljc})
+;; — one .cljc source, run on the JVM (clj/test, nemuri.server) AND compiled
+;; here into the Worker. clj/test itself is NOT added as a source-path: it
+;; also contains nemuri.server-test, which is JVM-only (java.net.* interop,
+;; no reader-conditional) and would fail this cljs build.
+{:source-paths ["src" "test" "../../clj/src"]
+
+ :dependencies []
+
+ :builds
+ {:worker {:target :esm
+           :output-dir "out"
+           :modules {:worker {:exports {default nemuri.appview.worker/handler}}}}
+  :worker-test {:target :node-test
+                :output-to "out/node-tests.js"
+                :ns-regexp "-test$"}}}
