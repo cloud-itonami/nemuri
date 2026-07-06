@@ -17,6 +17,11 @@ build/
 dist/
 out/
 
+# shadow-cljs / Clojure CLI build caches
+.shadow-cljs/
+.cpcache/
+target/
+
 # Python
 __pycache__/
 *.py[cod]
