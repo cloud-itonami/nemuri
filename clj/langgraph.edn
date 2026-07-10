@@ -1,6 +1,1 @@
-{:graphs ["health" "plan_growth" "gen_content" "ad_buy" "lp_optimize"
-          "seo_research" "onboard" "billing" "inventory" "logistics"
-          "takeback" "swap" "care" "retention" "finance" "pricing"
-          "partner_scout" "compliance" "risk" "board_review"]
- :entrypoint nemuri.server
- :runtime :clj}
+[{:db/id -1, :langgraph/graphs ["health" "plan_growth" "gen_content" "ad_buy" "lp_optimize" "seo_research" "onboard" "billing" "inventory" "logistics" "takeback" "swap" "care" "retention" "finance" "pricing" "partner_scout" "compliance" "risk" "board_review"], :langgraph/entrypoint "nemuri.server", :langgraph/runtime :clj}]
