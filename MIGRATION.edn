@@ -1,0 +1,42 @@
+{:migration/id :gftdcojp/nemuri-numbered-root-drain
+ :migration/status :standalone-ready
+ :migration/canonical-owner
+ {:repo "gftdcojp/ai-gftd-nemuri"
+  :west-path "orgs/gftdcojp/ai-gftd-nemuri"
+  :runtime-roots ["clj" "appview/ai-gftd-wasm-nemuri-nmr5l33p"]
+  :worker-entrypoint "appview/ai-gftd-wasm-nemuri-nmr5l33p/out/worker.js"
+  :worker-source "appview/ai-gftd-wasm-nemuri-nmr5l33p/src/nemuri/appview/worker.cljs"}
+ :migration/source
+ {:repo "gftdcojp/ai-gftd-apps-gftdcojp"
+  :commit "e90e4146ea807298785365959dd006768187e4de"
+  :path "60-apps/ai-gftd-project-nemuri"}
+ :migration/dispositions
+ [{:path "appview/ai-gftd-wasm-nemuri-nmr5l33p/src/app.ts"
+   :action :prune
+   :reason "Development fallback for a SvelteKit/dispatcher topology superseded by the tested shadow-cljs fetch worker."}
+  {:path "appview/ai-gftd-wasm-nemuri-nmr5l33p/svelte"
+   :action :retired-provenance
+   :reason "SvelteKit surface was never built and is not the canonical CLJC Worker substrate. The generic UI and dead dispatcher proxy are pruned."
+   :deferred-port
+   ["typed D1 operations from svelte/src/routes/_d1/+server.ts"
+    "getActiveLp and listSubscriptions reads from svelte/src/routes/xrpc/[nsid]/+server.ts"]}
+  {:path "appview/ai-gftd-wasm-nemuri-nmr5l33p/wrangler.jsonc"
+   :action :replace
+   :reason "Standalone configuration points to out/worker.js and removes the decommissioned dispatcher secret and URL."}
+  {:path "docs/CLAUDE.md"
+   :action :merge
+   :reason "Standalone document is newer for the CLJC runtime; numbered-root 2026-07-07 Python retirement is retained as provenance."}
+  {:path "lg"
+   :action :historical
+   :reason "Python LangGraph pod was never deployed and was pruned on 2026-07-07; no Helm chart existed."}]
+ :migration/invariants
+ {:numbered-root-may-be-tombstoned true
+  :typescript-worker-present false
+  :svelte-runtime-present false
+  :dispatcher-hop-present false
+  :python-runtime-present false
+  :clojure-runtime-present true
+  :shadow-cljs-worker-present true
+  :d1-get-active-lp-implemented false}
+ :migration/provenance-note
+ "Pruned TS/Svelte and Python source remains recoverable at the source commit above. D1 behavior must be ported to CLJC with tests before it becomes operational."}
