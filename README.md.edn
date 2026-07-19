@@ -1,1 +1,4 @@
-[{:db/id -1, :readme/name "ai-gftd-nemuri", :readme/source "orgs/gftdcojp/ai-gftd-apps-gftdcojp/60-apps/ai-gftd-project-nemuri", :readme/note "Split from ai-gftd-apps-gftdcojp for west-managed project ownership."}]
+[{:db/id -1
+  :readme/name "ai-gftd-nemuri"
+  :readme/source "orgs/gftdcojp/ai-gftd-apps-gftdcojp/60-apps/ai-gftd-project-nemuri"
+  :readme/note "Standalone west owner. The CLJC graph and shadow-cljs Worker are canonical; the former TS/Svelte, dispatcher, and Python pod surfaces are retired in MIGRATION.edn."}]

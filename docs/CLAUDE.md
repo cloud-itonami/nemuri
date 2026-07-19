@@ -1,6 +1,13 @@
 # ai-gftd-project-nemuri — 月1,000円 洗える敷布団サブスク (フルLLM自律運営)
 
-共通ルールは `60-apps/CLAUDE.md`。設計 SSoT = `90-docs/adr/2606071200-nemuri-llm-operated-subscription-bmc-actors.md`。
+> **Standalone owner / retirement boundary (2026-07-19)**: canonical source is
+> `orgs/gftdcojp/ai-gftd-nemuri`. The old Python `lg/` pod was never deployed
+> and was pruned on 2026-07-07; no Helm release existed. The numbered-root
+> TS/Svelte facade and its dispatcher hop are also retired. Its typed D1
+> handlers remain provenance for a future CLJC port, not deployable source.
+> Exact source paths and dispositions are recorded in `MIGRATION.edn`.
+
+設計 provenance = 旧 root `90-docs/adr/2606071200-nemuri-llm-operated-subscription-bmc-actors.md`。
 
 ## Overview
 
@@ -48,7 +55,7 @@ appview/ai-gftd-wasm-nemuri-nmr5l33p/{magatama.jsonld, wrangler.jsonc,
 CEO OODA is represented by the CLJ `board_review` plan surface.
 ```
 
-> 2026-07-06 update (ADR-2607061200): the `svelte/` + `src/app.cljc`
+> 2026-07-06 update (ADR-2607061200): the numbered-root `svelte/` + `src/app.ts`
 > ("SvelteKit adapter fallback") layout this note replaces was never actually
 > built and is now superseded — per ADR-2606290000 ("worker は全て CLJC の
 > みに") SvelteKit isn't the target substrate for new gftdcojp Workers
