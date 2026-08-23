@@ -179,3 +179,13 @@ HTTP from the Worker.
 - `getActiveLp` is the one forward-work item this ADR creates: it needs a
   real D1 read, which is a deliberate scope boundary (the other 20 stay
   provably zero-I/O), not an oversight.
+
+## 2026-08-15 persistence retirement note
+
+The reserved `NEMURI_DB` binding was never used by a live route:
+`getActiveLp` still returned 404, and the preceding 30 days contained no
+writes and only the retirement audit read. The seven-row database (one
+migration row and six source-controlled LP seeds) was exported to
+`cloud-itonami-backup/d1-retired/2026-08-15/` in R2 and the binding was
+removed. A future `getActiveLp` implementation must use the
+kotobase.net/R2 persistence plane rather than recreating this D1.

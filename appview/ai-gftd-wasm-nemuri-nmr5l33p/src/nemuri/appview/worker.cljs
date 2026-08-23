@@ -10,11 +10,10 @@
   network hop, no D1/Stripe/carrier/OPA/LLM/mailer call anywhere in this
   path — every handler returns `dry_run true` / `approval_required` per
   ADR-2606071200's envelope model; see ADR-2607061200 for what's still
-  stubbed (`ai.gftd.apps.nemuri.getActiveLp` needs a real D1 read of
-  `lp_variants`, which this Worker does not yet wire up).
-
-  Env bindings: NEMURI_DB (D1, unused by any route yet — reserved for
-  getActiveLp)."
+  stubbed (`ai.gftd.apps.nemuri.getActiveLp` needs a persistence-backed
+  implementation, which this Worker does not yet wire up). The unused D1
+  reservation was retired on 2026-08-15; a future implementation must use
+  the kotobase.net/R2 persistence plane."
   (:require [clojure.string :as str]
             [nemuri.core :as core]
             [nemuri.xrpc :as xrpc]))
