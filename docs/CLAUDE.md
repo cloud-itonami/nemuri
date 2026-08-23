@@ -35,10 +35,10 @@
 
 growthStrategist(planGrowth) / contentSmith(generateContent) / adBuyer(manageAds, B) / lpOptimizer(optimizeLp) / seoResearcher(researchSeo) / onboardConcierge(onboardSubscriber) / billingClerk(chargeRecurring, B) / inventoryPlanner(planInventory, B) / logisticsDispatcher(dispatchShipment) / takebackCoordinator(scheduleTakeback) / swapScheduler(offerSwap) / careAgent(handleInquiry) / retentionAgent(runRetention) / financeController(reportPnl) / pricingExperimenter(experimentPricing, B) / partnerScout(scoutPartners, B) / complianceOfficer(ensureCompliance, B) / riskSentinel(guardRisk, 緊急権限) / ceoOrchestrator(runBoardReview, keiei)
 
-## Persistence (ADR-2606041900 = yukkuri D1 パターン)
+## Persistence
 
-- **Domain** = Cloudflare D1 (`ai-gftd-nemuri`)。appview Worker `/_d1`(`x-internal-trust`, typed ops) が D1 を所有。CLJ task runtime は plan-only で D1/Stripe/Carrier/Ads/OPA/LLM/mailer を直接呼ばない。
-- **State (PII/住所/決済)** = T3 Preferences / Stripe。D1 にも AT Record にも書かない (ADR-0018)。
+- **Domain** = 現在は永続化なし。CLJ task runtime と appview Worker は plan-only で、D1/Stripe/Carrier/Ads/OPA/LLM/mailer を直接呼ばない。未使用だった `ai-gftd-nemuri` D1 は 2026-08-15 に R2 archive 後 retire。将来の永続化は kotobase.net/R2 plane を使う。
+- **State (PII/住所/決済)** = T3 Preferences / Stripe。R2 にも AT Record にも書かない (ADR-0018)。
 - **Checkpointer** = なし。CLJ runtime は deterministic request/response surface。
 
 ## Layout
@@ -77,7 +77,7 @@ CEO OODA is represented by the CLJ `board_review` plan surface.
 ## Deploy checklist (forward work)
 
 1. Lexicon 3-step: `bundle-lexicons.mjs` → `gen-pds-lexicon-registry.mjs` → atproto `wrangler deploy`
-2. D1 作成 + `wrangler d1 migrations apply ai-gftd-nemuri` + wrangler.jsonc の `database_id` 差替
+2. 永続化が必要になった場合は kotobase.net/R2 adapter を実装し、実ルートのテストを追加
 3. lg-nemuri-clj build/push from `clj/Dockerfile` + Helm chart (`50-infra/vultr/lg-nemuri-pool/`, lg-yukkuri-pool ミラー)
 4. OPA に envelope.rego ロード
 5. Stripe Billing / 3PL / 反毛リサイクル業者 契約 + 特商法ページ法務レビュー
@@ -90,8 +90,9 @@ CEO OODA is represented by the CLJ `board_review` plan surface.
   pure handler に直結（dispatcher.gftd.ai 経由なし。そのホップは恒久的に死んで
   いる — k8s クラスタ自体が撤去済み）。
 - **`ai.gftd.apps.nemuri.getActiveLp`（`query`）のみ未実装**: lexicon には
-  存在するが `nemuri.core/nsid->graph` に対応 graph が無く、実 D1 (`lp_variants`
-  テーブル、`d1/migrations/0001_nemuri.sql`) の read が要る唯一の NSID。
+  存在するが `nemuri.core/nsid->graph` に対応 graph が無く、永続化された
+  `lp_variants` の read が要る唯一の NSID。旧D1 migration は schema/seed の
+  provenance として残すが、実装時は kotobase.net/R2 adapter を使う。
   他 19 NSID の "zero I/O / pure" 前提が崩れるため、意図的に後続タスクとして
   残してある（`nemuri.xrpc/not-implemented-nsids` に明示）。呼ぶと
   `unknown_nsid`（404）。
