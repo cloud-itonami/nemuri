@@ -1,6 +1,6 @@
 (ns nemuri.server
   (:gen-class)
-  (:require [clojure.string :as str]
+  (:require [kotoba.lang.text :as str]
             [clojure.tools.logging :as log]
             [jsonista.core :as json]
             [nemuri.core :as core]
@@ -32,7 +32,7 @@
 (defn- camel->snake [s]
   (-> (name s)
       (str/replace #"([a-z0-9])([A-Z])" "$1_$2")
-      str/lower-case))
+      str/lower))
 
 (defn- normalize-keys [x]
   (cond

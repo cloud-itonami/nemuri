@@ -1,5 +1,5 @@
 (ns nemuri.core
-  (:require [clojure.string :as str]))
+  (:require [kotoba.lang.text :as str]))
 
 (def graph-names
   ["health" "plan_growth" "gen_content" "ad_buy" "lp_optimize" "seo_research"
@@ -155,7 +155,7 @@
    :dry_run true})
 
 (defn care [payload]
-  (let [body (str/lower-case (str (:body payload "")))
+  (let [body (str/lower (str (:body payload "")))
         refund? (or (str/includes? body "refund") (str/includes? body "返金"))]
     {:intent (if refund? "refund" "general")
      :reply_ja (if refund? "返金/解約条件を確認し、必要な手続きを案内します。" "お問い合わせありがとうございます。確認してご案内します。")
