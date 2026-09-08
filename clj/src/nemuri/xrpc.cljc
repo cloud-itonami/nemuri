@@ -16,12 +16,12 @@
   `nemuri.server` itself is left untouched (it has its own inline camel->snake
   for the same reason, predates this ns, and is already covered by
   `nemuri.server-test`) — this ns is additive, not a refactor of it."
-  (:require [clojure.string :as str]
+  (:require [kotoba.lang.text :as str]
             [nemuri.registry :as registry]))
 
 (defn- camel->snake-str [s]
   (-> (str/replace s #"([a-z0-9])([A-Z])" "$1_$2")
-      str/lower-case))
+      str/lower))
 
 (defn- snake->camel-str [s]
   (let [[head & tail] (str/split s #"_")]
