@@ -7,4 +7,4 @@ COPY src ./src
 
 ENV LANGSERVER_PORT=8000
 EXPOSE 8000
-CMD ["clojure", "-M", "-m", "nemuri.server"]
+CMD ["kbb", "-M", "-m", "nemuri.server"]

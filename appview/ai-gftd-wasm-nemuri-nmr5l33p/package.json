@@ -6,8 +6,8 @@
     "wrangler": "^4.0.0"
   },
   "scripts": {
-    "test": "shadow-cljs compile worker-test && node out/node-tests.js",
-    "build": "shadow-cljs release worker",
-    "dev": "shadow-cljs watch worker"
+    "test": "amu compile --target wasm32-browser worker-test && node out/node-tests.js",
+    "build": "amu compile --target wasm32-browser worker",
+    "dev": "amu compile --target wasm32-browser worker"
   }
 }
