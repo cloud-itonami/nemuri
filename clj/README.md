@@ -11,5 +11,5 @@ Money, legal, purchase-order, and contract operations return explicit
 Run tests:
 
 ```sh
-clojure -M:test
+kbb -M:test
 ```

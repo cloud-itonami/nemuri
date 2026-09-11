@@ -2,7 +2,7 @@
 ;; source-path convention per orgs/kotoba-lang/kotobase-cljc-worker,
 ;; ADR-2606290000 "worker は全て CLJC のみに").
 ;;  :worker      — :esm workerd bundle (default export = fetch handler),
-;;                 `npx shadow-cljs release worker` -> out/worker.js
+;;                 `amu compile --target wasm32-browser worker` -> out/worker.js
 ;;                 (wrangler.jsonc `main`).
 ;;  :worker-test — node-test of the same fetch-handler (real js/Request /
 ;;                 js/Response / js/URL — all Node 18+ globals, no mocking).

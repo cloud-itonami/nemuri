@@ -10,7 +10,7 @@
   `clojure.string` + `nemuri.registry`) place that conversion lives so both
   the JVM server and the Cloudflare Worker (appview/.../src/nemuri/appview/
   worker.cljs) can share it and stay provably in sync, and so it is testable
-  identically on the JVM (`clojure -M:test`) and under cljs (shadow-cljs
+  identically on the JVM (`kbb -M:test`) and under cljs (shadow-cljs
   `:worker-test`, ADR-2607061200) without a fetch/Request/D1 stub in sight.
 
   `nemuri.server` itself is left untouched (it has its own inline camel->snake

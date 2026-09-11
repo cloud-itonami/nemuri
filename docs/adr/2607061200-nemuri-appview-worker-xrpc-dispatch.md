@@ -52,7 +52,7 @@ Two things had to be verified rather than assumed before building anything:
    actually hold, and do they really compile/run under cljs (required for a
    shadow-cljs Worker build), not just the JVM?** Confirmed by reading
    `clj/src/nemuri/{core,registry}.cljc` (no D1/Stripe/carrier/Ads/OPA/LLM/
-   mailer references anywhere) and by an actual shadow-cljs compile + `node`
+   mailer references anywhere) and by an actual amu compile --target wasm32-browser + `node`
    run of both namespaces under `:node-script`/`:node-test` targets before
    writing any Worker code — 0 warnings, correct output. Confirmed against
    the true source of the NSID contracts, `00-contracts/lexicons/ai/gftd/
@@ -133,19 +133,19 @@ HTTP from the Worker.
 
 ## Verification
 
-- **JVM**: `cd clj && clojure -M:test` — 11 tests / 38 assertions / 0
+- **JVM**: `cd clj && kbb -M:test` — 11 tests / 38 assertions / 0
   failures (pre-existing `nemuri.core-test` + `nemuri.server-test`, plus new
   `nemuri.xrpc-test` covering the camelCase<->snake_case transform and
   `xrpc/handle` against `onboardSubscriber`, `chargeRecurring`, `planGrowth`
   (nested budget lines), and the `getActiveLp` 404 fallback).
 - **cljs / Worker**: `cd appview/ai-gftd-wasm-nemuri-nmr5l33p && npm install
-  && npm test` — `shadow-cljs compile worker-test` (0 warnings) + `node
+  && npm test` — `amu compile --target wasm32-browser worker-test` (0 warnings) + `node
   out/node-tests.js` — 7 tests / 15 assertions / 0 failures, exercising the
   actual compiled `fetch-handler` against real Node `Request`/`Response`/
   `URL` globals (no mocking): health, onboard success + validation-error
   (404), `chargeRecurring` camelCase round-trip, `reportPnl` via `GET` with
   a query string, `getActiveLp` 404, and an unmatched path 404.
-  `npx shadow-cljs release worker` -> `out/worker.js` (0 warnings, 127 KB),
+  `amu compile --target wasm32-browser worker` -> `out/worker.js` (0 warnings, 127 KB),
   then directly invoked the compiled module's exported `{fetch}` from `node`
   against `/xrpc/ai.gftd.apps.nemuri.onboardSubscriber` and `/health` —
   correct camelCase JSON both times.
