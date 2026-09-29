@@ -23,7 +23,7 @@
   {:path "appview/ai-gftd-wasm-nemuri-nmr5l33p/wrangler.jsonc"
    :action :replace
    :reason "Standalone configuration points to out/worker.js and removes the decommissioned dispatcher secret and URL."}
-  {:path "docs/CLAUDE.md"
+  {:path "docs/AGENTS.md"
    :action :merge
    :reason "Standalone document is newer for the CLJC runtime; numbered-root 2026-07-07 Python retirement is retained as provenance."}
   {:path "lg"

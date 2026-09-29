@@ -19,7 +19,7 @@ directly into its Worker against D1 bindings it already owned), scouting
   var pointing at `dispatcher.gftd.ai/xrpc`, with routes for `nubatama.net`
   and `nemuri.gftd.ai`.
 - Neither `src/app.cljc` nor any `svelte/` tree existed on disk. The repo's
-  own `docs/CLAUDE.md` had flagged this layout — `svelte/src/{lib/api.cljc,
+  own `docs/AGENTS.md` had flagged this layout — `svelte/src/{lib/api.cljc,
   routes/+page.svelte, routes/xrpc/[nsid]/+server.cljc, routes/_d1/+server.cljc}`
   plus `src/app.cljc` as "SvelteKit adapter の fallback" — as 未実装
   (scaffold段階), i.e. aspirational, never built.
@@ -120,7 +120,7 @@ Routing it hits `nemuri.registry/dispatch-nsid`'s generic `unknown_nsid`
 fallback (404), tracked explicitly in code as
 `nemuri.xrpc/not-implemented-nsids`. Follow-up: wire a D1-backed read path
 once the Worker is ready to own any I/O at all (today it owns none, by
-design — see `docs/CLAUDE.md`'s persistence note).
+design — see `docs/AGENTS.md`'s persistence note).
 
 Separately unimplemented, unchanged from before this ADR (not a regression,
 never existed): actual Stripe charge execution, carrier label purchase, Ads
@@ -173,7 +173,7 @@ HTTP from the Worker.
 - `ai-gftd-nemuri` is no longer scaffold-only for its 20 core NSIDs; it can
   be deployed (after review) and will serve dry-run/plan responses with no
   external dependency at all.
-- `docs/CLAUDE.md`'s Layout and 未実装 sections were updated to match reality
+- `docs/AGENTS.md`'s Layout and 未実装 sections were updated to match reality
   (the SvelteKit-shaped layout note is kept, marked superseded, so future
   readers don't rediscover the same dead end).
 - `getActiveLp` is the one forward-work item this ADR creates: it needs a
